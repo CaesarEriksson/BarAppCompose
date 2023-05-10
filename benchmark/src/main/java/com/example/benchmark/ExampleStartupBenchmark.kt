@@ -57,6 +57,25 @@ class ExampleStartupBenchmark {
         //UI Automator
         addElementsAndScrollDown()
     }
+
+
+    @Test
+    fun navigate() = benchmarkRule.measureRepeated(
+        packageName = "kth.compose3",
+        metrics = listOf(FrameTimingMetric()),
+        compilationMode = CompilationMode.Partial(),
+        iterations = 5,
+        startupMode = StartupMode.COLD,
+        setupBlock = {
+            startActivityAndWait()
+        }
+
+    ) {
+        device.findObject(By.desc("Heart Button 1")).click()
+        device.findObject(By.desc("My Favorites")).click()
+        device.findObject(By.desc("Drink Card 1")).click()
+    }
+
 }
 
 fun MacrobenchmarkScope.addElementsAndScrollDown(){

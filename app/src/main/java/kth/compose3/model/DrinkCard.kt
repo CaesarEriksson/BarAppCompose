@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kth.compose3.R
@@ -35,6 +37,7 @@ fun DrinkCard(drink: Drink, navController: NavController) {
             .padding(end = 5.dp, top = 5.dp, bottom = 5.dp)
             .fillMaxWidth()
             .height(80.dp)
+            .semantics { contentDescription = "Drink Card ${drink.id}" }
             .clickable { navController.navigate("info/${drink.id}") },
         shape = MaterialTheme.shapes.medium,
         elevation = 5.dp,
@@ -67,7 +70,7 @@ fun DrinkCard(drink: Drink, navController: NavController) {
             IconButton(onClick = {
                 isClicked = !isClicked
                 favoriteDrinks.add(drink)
-            }) {
+            }, modifier = Modifier.semantics { contentDescription = "Heart Button ${drink.id}" }) {
                 if (!isClicked) {
                     Image(
                         painter = painterResource(R.drawable.baseline_favorite_gray_border_24),
