@@ -2,14 +2,12 @@ package com.example.benchmark
 
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.FrameTimingMetric
-import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
-import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,23 +42,37 @@ class ExampleStartupBenchmark {
     }
 
     @Test
-    fun scrollAndNavigate() = benchmarkRule.measureRepeated(
+    fun scroll() = benchmarkRule.measureRepeated(
         packageName = "kth.compose3",
         metrics = listOf(FrameTimingMetric()),
         compilationMode = CompilationMode.Partial(),
         iterations = 5,
-        startupMode = StartupMode.COLD
+        startupMode = StartupMode.HOT,
+        setupBlock = {
+            startActivityAndWait()
+        }
     ) {
-        pressHome()
-        startActivityAndWait()
 
-        //UI Automator
-        addElementsAndScrollDown()
+        val list = device.findObject(By.desc("item_list"))
+
+        device.waitForIdle()
+
+        if (list != null) {
+            list.setGestureMargin(device.displayWidth / 3)
+            repeat(12) { //Should be set to 1/4 of the elements in the complete list
+                list.fling(Direction.DOWN, 1000)
+                device.waitForIdle()
+            }
+            repeat(12) {//Same as previous
+                list.fling(Direction.UP, 1000)
+                device.waitForIdle()
+            }
+        }
+
     }
 
-
     @Test
-    fun navigate() = benchmarkRule.measureRepeated(
+    fun navigateUserJourney() = benchmarkRule.measureRepeated(
         packageName = "kth.compose3",
         metrics = listOf(FrameTimingMetric()),
         compilationMode = CompilationMode.Partial(),
@@ -76,18 +88,25 @@ class ExampleStartupBenchmark {
         device.findObject(By.desc("Drink Card 1")).click()
     }
 
-}
+    @Test
+    fun navigateBottomMenu() = benchmarkRule.measureRepeated(
+        packageName = "kth.compose3",
+        metrics = listOf(FrameTimingMetric()),
+        compilationMode = CompilationMode.Partial(),
+        iterations = 5,
+        startupMode = StartupMode.COLD,
+        setupBlock = {
+            startActivityAndWait()
+        }
 
-fun MacrobenchmarkScope.addElementsAndScrollDown(){
-    val list = device.findObject(By.res("item_list"))
+    ) {
+        repeat(5) {
+            device.findObject(By.desc("Drinks")).click()
+            device.findObject(By.desc("My Favorites")).click()
+            device.findObject(By.desc("Suggestion")).click()
+        }
 
-    device.waitForIdle()
+    }
 
-    list.setGestureMargin(device.displayWidth / 5)
-    list.fling(Direction.DOWN)
 
-    device.waitForIdle()
-
-    device.findObject(By.text("Old Fashioned")).click()
-    device.wait(Until.hasObject(By.text("Old Fashioned")), 5000)
 }

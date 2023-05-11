@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +46,7 @@ import kth.compose3.ui.theme.Orange20
 @Composable
 fun HomeScreen(navController: NavController, drinkList: List<Drink>) {
     LazyColumn(
-        modifier = Modifier.fillMaxWidth().testTag("item_list"),
+        modifier = Modifier.fillMaxWidth().semantics { contentDescription = "item_list" },
         contentPadding = PaddingValues(5.dp)
 
     ) {
